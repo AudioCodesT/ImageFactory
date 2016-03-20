@@ -1,3 +1,5 @@
 */packer_cache
 */output-virtualbox-iso/*
 .DS_Store
+centos-5.7-x86_64/packer_virtualbox-iso_virtualbox-iso
+centos-5.7-i386/packer_virtualbox-iso_virtualbox-iso
