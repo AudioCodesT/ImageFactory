@@ -1,0 +1,57 @@
+{
+  "variables": {
+      "vm_Version": "0.0.1",
+      "vm_name": "CentOS-5.7-i386",
+      "iso_checksum": "11222d9134cdfc101f6f91fe544254c9",
+      "iso_url": "http://mirror.nsc.liu.se/centos-store/5.7/isos/i386/CentOS-5.7-i386-netinstall.iso"
+  },
+  "builders": [
+{
+      "type": "virtualbox-iso",
+      "vm_name": "{{ user `vm_name` }}",
+      "iso_checksum_type": "md5",
+      "iso_checksum": "{{ user `iso_checksum` }}",
+      "iso_url": "{{ user `iso_url` }}",
+      "http_directory": ".",
+      "boot_command": [
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter>"
+      ],
+      "headless": "false",
+      "guest_os_type": "RedHat",
+      "vboxmanage": [
+        [ "modifyvm", "{{.Name}}", "--memory", "1024" ],
+        [ "modifyvm", "{{.Name}}", "--cpus",   "1"    ]
+      ],
+      "ssh_password": "centos",
+      "ssh_username": "centos",
+      "ssh_wait_timeout": "50000s",
+      "shutdown_command": "echo 'centos' | sudo -S /sbin/halt -h -p",
+      "format": "ova"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "echo 'centos' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "override": {
+        "virtualbox-iso": {
+          "scripts": [
+            "../lib/setup.sh",
+            "../lib/bootstrap.sh",
+            "../lib/disable-selinux.sh",
+            "../lib/sshd_config.sh",
+            "../lib/enable_key_insertion.sh",
+            "../lib/cleanup.sh"
+          ]
+        }
+      }
+    }
+  ],
+  "post-processors": [
+
+   {
+      "type": "compress",
+      "keep_input_artifact": true
+    }
+  ]
+}
